@@ -38,10 +38,10 @@ const QuoteGenerator = () => {
       }
       
       setLoading(false);
-    // eslint-disable-next-line no-unused-vars
-    } catch (err) {
+    
+    } catch (error) {
       setError('Failed to fetch quotes. Please try again later.');
-      setLoading(false);
+      setLoading(error);
     }
   };
 
