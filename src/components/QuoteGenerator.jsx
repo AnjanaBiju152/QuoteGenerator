@@ -30,18 +30,17 @@ const QuoteGenerator = () => {
     try {
       setLoading(true);
       const response = await axios.get('https://dummyjson.com/quotes');
-      setQuotes(response.data.quotes);
-      
-      if (response.data.quotes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * response.data.quotes.length);
-        setCurrentQuote(response.data.quotes[randomIndex]);
+      const allQuotes = response.data.quotes;
+
+      setQuotes(allQuotes);
+      if (allQuotes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * allQuotes.length);
+        setCurrentQuote(allQuotes[randomIndex]);
       }
-      
       setLoading(false);
-    
     } catch (error) {
       setError('Failed to fetch quotes. Please try again later.');
-      setLoading(error);
+      setLoading(false);
     }
   };
 
@@ -50,30 +49,26 @@ const QuoteGenerator = () => {
   }, []);
 
   const handleNewQuote = () => {
-    if (quotes.length > 0) {
-      const filteredQuotes = quotes.filter(quote => quote.id !== currentQuote.id);
+    if (quotes.length > 1 && currentQuote) {
+      const filteredQuotes = quotes.filter(q => q.id !== currentQuote.id);
       const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
       setCurrentQuote(filteredQuotes[randomIndex]);
     }
   };
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        Inspiring Wisdom Loading...
-      </div>
-    );
+    return <div className="loading-container">Inspiring Wisdom Loading...</div>;
   }
 
   if (error) {
-    return (
-      <div className="error-container">
-        {error}
-      </div>
-    );
+    return <div className="error-container">{error}</div>;
   }
 
-  const authorImage = AUTHOR_IMAGES[currentQuote.author] || 
+  if (!currentQuote) {
+    return <div className="error-container">No quote available at the moment.</div>;
+  }
+
+  const authorImage = AUTHOR_IMAGES[currentQuote.author] ||
     "https://via.placeholder.com/180?text=Author";
 
   return (
@@ -88,23 +83,14 @@ const QuoteGenerator = () => {
         </div>
 
         <div className="quote-text">
-          <div className="quote-mark quote-mark-top">
-            "
-          </div>
+          <div className="quote-mark quote-mark-top">"</div>
           {currentQuote.quote}
-          <div className="quote-mark quote-mark-bottom">
-            "
-          </div>
+          <div className="quote-mark quote-mark-bottom">"</div>
         </div>
 
-        <div className="author-name">
-          - {currentQuote.author}
-        </div>
+        <div className="author-name">- {currentQuote.author}</div>
 
-        <button 
-          onClick={handleNewQuote}
-          className="new-quote-btn"
-        >
+        <button onClick={handleNewQuote} className="new-quote-btn">
           New Inspirational Quote
         </button>
       </div>
